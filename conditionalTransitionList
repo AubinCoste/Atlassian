@@ -1,0 +1,10 @@
+#This conditional script allow transition only if current status is part of list "availableStatus"
+
+import com.atlassian.jira.issue.Issue
+import org.apache.log4j.Level
+import org.apache.log4j.Logger
+
+def currentStatus = issue.getStatus().name
+def availableStatus = ["Status"]
+
+availableStatus.contains(currentStatus)
