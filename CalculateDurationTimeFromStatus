@@ -1,0 +1,29 @@
+#This scripted field is to get delta time from created time and status set in STATUS_TO_CHECK
+
+import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.issue.history.ChangeItemBean
+import com.atlassian.core.util.DateUtils
+
+def changeHistoryManager = ComponentAccessor.getChangeHistoryManager()
+
+def fromStatus = "STATUS_TO_CHECK"
+
+List<Long> rt = [0L]
+def changeItems = changeHistoryManager.getChangeItemsForField(issue, "status")
+changeItems.reverse().each { ChangeItemBean item ->
+    def timeDiff = System.currentTimeMillis() - item.created.getTime()
+    if (item.fromString == fromStatus) {
+        rt << -timeDiff
+    }
+    if (item.toString == fromStatus) {
+        rt << timeDiff
+    }
+}
+
+def newRT = rt as long []
+def total = newRT.sum()/ 1000 as long
+if (total == 0){
+    return null
+} else {
+   return total
+}  
