@@ -1,0 +1,28 @@
+#Adding days spent in status
+
+import com.atlassian.jira.component.ComponentAccessor
+import com.onresolve.jira.groovy.user.FieldBehaviours
+import com.atlassian.jira.issue.Issue
+import java.sql.Timestamp
+
+
+void addWorkDays(Calendar date, int n) {
+  def i = 0
+  while (i < n) {
+    date.add(Calendar.DAY_OF_YEAR, 1)
+    if (!(date.get(Calendar.DAY_OF_WEEK) in [Calendar.SATURDAY, Calendar.SUNDAY])) { 
+      i++ 
+    }
+  }
+}
+
+def today = new java.sql.Timestamp(new Date().getTime()) as Date
+def customFieldEstimateEndDate = ComponentAccessor.customFieldManager.getCustomFieldObject(39886)
+Calendar c = Calendar.getInstance();
+def dateEstimateEndDate = issue.getCustomFieldValue(customFieldEstimateEndDate) as Date
+c.setTime(dateEstimateEndDate);
+def customFieldValuePendingStartedDate = issue.getCustomFieldValue(ComponentAccessor.customFieldManager.getCustomFieldObject(38680)) as Date
+
+def differenceCalculated = today - customFieldValuePendingStartedDate as Integer
+addWorkDays(c, differenceCalculated.toInteger())
+issue.setCustomFieldValue(customFieldEstimateEndDate, c.time.toTimestamp())
